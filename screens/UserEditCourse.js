@@ -10,6 +10,7 @@ import {
 import globalStyles from "../styles/globalStyles";
 import { useDispatch, useSelector } from "react-redux";
 import { editCourse } from "../redux/actions/actionEditCourse";
+import { createCourse } from "./../redux/actions/actionCreateCourse";
 
 const UserEditCourse = ({ route, navigation }) => {
   const courseId = route.params.courseId;
@@ -20,7 +21,11 @@ const UserEditCourse = ({ route, navigation }) => {
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState(myCourse ? myCourse.title : "");
-  const [img, setImg] = useState(myCourse ? myCourse.image : "");
+  const [img, setImg] = useState(
+    myCourse
+      ? myCourse.image
+      : "https://cdn.pixabay.com/photo/2021/12/11/21/40/computer-6863693_1280.jpg"
+  );
   const [price, setPrice] = useState("");
   const [desc, setDesc] = useState(myCourse ? myCourse.description : "");
 
@@ -30,10 +35,9 @@ const UserEditCourse = ({ route, navigation }) => {
       dispatch(editCourse(courseId, title, img, desc));
     } else {
       //CREATION
-      // dispatch()
-      alert("creation");
+      dispatch(createCourse(title, desc, img, +price));
     }
-    navigation.goBack()
+    navigation.goBack();
   };
 
   return (

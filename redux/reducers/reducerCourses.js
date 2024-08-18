@@ -1,5 +1,6 @@
 import {
   ADD_TO_CART,
+  CREATE_COURSE,
   DELETE_COURSE,
   EDIT_COURSE,
   REMOVE_COURSE_CART,
@@ -51,7 +52,7 @@ const reducerCourses = (state = initialState, action) => {
     case EDIT_COURSE:
       const idCourse = action.courseId;
       const indexCourseToUpdate = state.loggedInmemberCourses.findIndex(
-        (course) => (course.id === idCourse)
+        (course) => course.id === idCourse
       );
 
       const updateCourse = new CourseModel(
@@ -77,10 +78,25 @@ const reducerCourses = (state = initialState, action) => {
         existingCourses: newExistingCourses,
         loggedInmemberCourses: newLoggedInmemberCourses,
       };
+    case CREATE_COURSE:
+      const newCourse = new CourseModel(
+        Date.now().toString(),
+        action.newCourse.title,
+        action.newCourse.description,
+        action.newCourse.image,
+        action.newCourse.price,
+        false,
+        "1"
+      );
+      return {
+        ...state,
+        existingCourses: state.existingCourses.concat(newCourse),
+        loggedInmemberCourses: state.loggedInmemberCourses.concat(newCourse),
+      };
+
     default:
       return state;
   }
 };
 
 export default reducerCourses;
- 
