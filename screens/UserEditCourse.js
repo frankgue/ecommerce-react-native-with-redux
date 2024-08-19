@@ -1,16 +1,12 @@
-import React, { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useReducer } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 import globalStyles from "../styles/globalStyles";
 import { useDispatch, useSelector } from "react-redux";
 import { editCourse } from "../redux/actions/actionEditCourse";
 import { createCourse } from "./../redux/actions/actionCreateCourse";
+import { formReducer } from "../formData/formReducer";
+import Input from "../components/Input";
+import BtnForm from "../components/BtnForm";
 
 const UserEditCourse = ({ route, navigation }) => {
   const courseId = route.params.courseId;
@@ -20,16 +16,32 @@ const UserEditCourse = ({ route, navigation }) => {
 
   const dispatch = useDispatch();
 
-  const [title, setTitle] = useState(myCourse ? myCourse.title : "");
-  const [img, setImg] = useState(
-    myCourse
-      ? myCourse.image
-      : "https://cdn.pixabay.com/photo/2021/12/11/21/40/computer-6863693_1280.jpg"
+  const formInitialState = {
+    inputValues: {
+      title: myCourse ? myCourse.title : "",
+      img: myCourse
+        ? myCourse.image
+        : "https://cdn.pixabay.com/photo/2021/12/11/21/40/computer-6863693_1280.jpg",
+      price: "",
+      desc: myCourse ? myCourse.description : "",
+    },
+    isValidInput: {
+      title: myCourse ? true : false,
+      img: myCourse ? true : false,
+      price: myCourse ? true : false,
+      desc: myCourse ? true : false,
+    },
+    isValidForm: myCourse ? true : false,
+  };
+
+  const [formState, formActionDispatch] = useReducer(
+    formReducer,
+    formInitialState
   );
-  const [price, setPrice] = useState("");
-  const [desc, setDesc] = useState(myCourse ? myCourse.description : "");
 
   const handlePress = () => {
+    const { title, img, price, desc } = formState.inputValues;
+
     if (courseId) {
       //MAJ
       dispatch(editCourse(courseId, title, img, desc));
@@ -40,49 +52,53 @@ const UserEditCourse = ({ route, navigation }) => {
     navigation.goBack();
   };
 
+  const inputHandler = (inputName, text) => {
+    let isValidInput = false;
+    if (text.length > 0) {
+      isValidInput = true;
+    }
+    //Dispacth de l'action
+    formActionDispatch({
+      type: "INPUT_VALIDATION",
+      value: text,
+      isValid: isValidInput,
+      input: inputName,
+    });
+  };
+
   return (
     <ScrollView>
       <View style={styles.FormContainer}>
-        <View style={styles.FormControl}>
-          <Text style={styles.label}>Titre</Text>
-          <TextInput
-            value={title}
-            onChangeText={(text) => setTitle(text)}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.FormControl}>
-          <Text style={styles.label}>Image (URL)</Text>
-          <TextInput
-            value={img}
-            onChangeText={(text) => setImg(text)}
-            style={styles.input}
-          />
-        </View>
-        {myCourse ? null : (
-          <View style={styles.FormControl}>
-            <Text style={styles.label}>Prix</Text>
-            <TextInput
-              value={price}
-              onChangeText={(text) => setPrice(text)}
-              style={styles.input}
-            />
-          </View>
-        )}
-        <View style={styles.FormControl}>
-          <Text style={styles.label}>Informations</Text>
-          <TextInput
-            value={desc}
-            onChangeText={(text) => setDesc(text)}
-            style={styles.input}
-          />
-        </View>
+        <Input
+          label="Titre"
+          value={formState.inputValues.title}
+          onKeyStroke={(text) => inputHandler("title", text)}
+        />
 
-        <TouchableOpacity onPress={handlePress}>
-          <View style={styles.btnContainer}>
-            <Text style={styles.btnText}>Valider</Text>
-          </View>
-        </TouchableOpacity>
+        {myCourse ? null : (
+          <Input
+            label="Prix"
+            value={formState.inputValues.price}
+            onKeyStroke={(text) => inputHandler("price", text)}
+            keyboardType="decimal-pad"
+          />
+        )}
+
+        <Input
+          label="Informations"
+          value={formState.inputValues.desc}
+          onKeyStroke={(text) => inputHandler("desc", text)}
+          multiline
+          numberOfLines={5}
+        />
+        <BtnForm
+          btnText={
+            formState.isValidForm
+              ? "Valider"
+              : "Veuillez remplir tous les champs"
+          }
+          activate={formState.isValidForm ? false : true}
+        />
       </View>
     </ScrollView>
   );
@@ -94,32 +110,6 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     padding: 20,
     margin: 20,
-  },
-  FormControl: {
-    width: "100%",
-  },
-  label: {
-    marginVertical: 15,
-    color: globalStyles.green,
-    fontWeight: "bold",
-  },
-  input: {
-    paddingHorizontal: 9,
-    paddingVertical: 9,
-    borderColor: globalStyles.green,
-    borderWidth: 0.5,
-    borderRadius: 6,
-  },
-  btnContainer: {
-    borderRadius: 6,
-    paddingVertical: 9,
-    paddingHorizontal: 25,
-    backgroundColor: globalStyles.orange,
-    marginTop: 20,
-  },
-  btnText: {
-    fontSize: 19,
-    textAlign: "center",
   },
 });
 
