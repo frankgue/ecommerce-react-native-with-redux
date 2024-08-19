@@ -1,17 +1,24 @@
-import React from "react";
+import React, { act } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import globalStyles from "../styles/globalStyles";
 
-const BtnForm = ({ btnText, activate }) => {
+const BtnForm = ({ btnText, activate, onHandlePress }) => {
   return (
-    <Pressable onPress={handlePress} disabled={activate}>
+    <Pressable onPress={onHandlePress} disabled={activate}>
       <View
         style={{
           ...styles.btnContainer,
           backgroundColor: activate ? globalStyles.orange : globalStyles.green,
         }}
       >
-        <Text style={styles.btnText}>{btnText}</Text>
+        <Text
+          style={{
+            ...styles.btnText,
+            color: activate ? globalStyles.darkGrey : globalStyles.white,
+          }}
+        >
+          {btnText}
+        </Text>
       </View>
     </Pressable>
   );

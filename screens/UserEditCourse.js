@@ -98,6 +98,7 @@ const UserEditCourse = ({ route, navigation }) => {
               : "Veuillez remplir tous les champs"
           }
           activate={formState.isValidForm ? false : true}
+          onHandlePress = {handlePress}
         />
       </View>
     </ScrollView>
